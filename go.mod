@@ -1,9 +1,9 @@
-module github.com/casbin/etcd-watcher/v2
+module github.com/batchcorp/etcd-watcher
 
 go 1.16
 
 require (
-	github.com/casbin/casbin/v2 v2.30.2
-	go.etcd.io/etcd/api/v3 v3.5.0
-	go.etcd.io/etcd/client/v3 v3.5.0
+	github.com/batchcorp/casbin/v2 v2.40.6-batch
+	go.etcd.io/etcd/api/v3 v3.5.1
+	go.etcd.io/etcd/client/v3 v3.5.1
 )

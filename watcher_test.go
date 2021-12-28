@@ -18,7 +18,7 @@ import (
 	"log"
 	"testing"
 
-	"github.com/casbin/casbin/v2"
+	"github.com/batchcorp/casbin/v2"
 )
 
 func updateCallback(rev string) {

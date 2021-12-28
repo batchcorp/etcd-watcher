@@ -1,7 +1,7 @@
 Etcd Watcher [![Go](https://github.com/casbin/etcd-watcher/actions/workflows/test.yml/badge.svg)](https://github.com/casbin/etcd-watcher/actions/workflows/test.yml) [![Coverage Status](https://coveralls.io/repos/github/casbin/etcd-watcher/badge.svg?branch=master)](https://coveralls.io/github/casbin/etcd-watcher?branch=master) [![Godoc](https://godoc.org/github.com/casbin/etcd-watcher?status.svg)](https://godoc.org/github.com/casbin/etcd-watcher)
 ====
 
-Etcd Watcher is the [Etcd](https://github.com/coreos/etcd) watcher for [Casbin](https://github.com/casbin/casbin). With this library, Casbin can synchronize the policy with the database in multiple enforcer instances.
+Etcd Watcher is the [Etcd](https://github.com/coreos/etcd) watcher for [Casbin](https://github.com/batchcorp/casbin). With this library, Casbin can synchronize the policy with the database in multiple enforcer instances.
 
 ## Installation
 
@@ -15,7 +15,7 @@ package main
 import (
     "log"
 
-    casbin "github.com/casbin/casbin/v2"
+    casbin "github.com/batchcorp/casbin/v2"
     etcdwatcher "github.com/casbin/etcd-watcher/v2"
 )
 
@@ -47,7 +47,7 @@ func main() {
 
 ## Getting Help
 
-- [Casbin](https://github.com/casbin/casbin)
+- [Casbin](https://github.com/batchcorp/casbin)
 
 ## License
 

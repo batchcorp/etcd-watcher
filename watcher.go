@@ -22,7 +22,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/casbin/casbin/v2/persist"
+	"github.com/batchcorp/casbin/v2/persist"
 	"go.etcd.io/etcd/api/v3/v3rpc/rpctypes"
 	client "go.etcd.io/etcd/client/v3"
 )
