@@ -16,6 +16,8 @@ package etcdwatcher
 
 import (
 	"context"
+	"crypto/tls"
+	"crypto/x509"
 	"log"
 	"runtime"
 	"strconv"
@@ -23,6 +25,7 @@ import (
 	"time"
 
 	"github.com/batchcorp/casbin/v2/persist"
+	"github.com/pkg/errors"
 	"go.etcd.io/etcd/api/v3/v3rpc/rpctypes"
 	client "go.etcd.io/etcd/client/v3"
 )
@@ -35,6 +38,20 @@ type Watcher struct {
 	running   bool
 	callback  func(string)
 	keyName   string
+	authConfig *AuthConfig
+}
+
+type AuthConfig struct {
+	UseTLS bool
+
+	// Contents of the certs/keys (ie. not files); not used if UseTLS is false
+	CACert     string
+	ClientKey  string
+	ClientCert string
+
+	// Not used if username or password empty
+	Username string
+	Password string
 }
 
 // finalizer is the destructor for Watcher.
@@ -44,12 +61,14 @@ func finalizer(w *Watcher) {
 
 // NewWatcher is the constructor for Watcher.
 // endpoints is the endpoints for etcd clusters.
-func NewWatcher(endpoints []string, keyName string) (persist.Watcher, error) {
-	w := &Watcher{}
-	w.endpoints = endpoints
-	w.running = true
-	w.callback = nil
-	w.keyName = keyName
+func NewWatcher(endpoints []string, keyName string, authConfig *AuthConfig) (persist.Watcher, error) {
+	w := &Watcher{
+		endpoints: endpoints,
+		running: true,
+		callback: nil,
+		keyName: keyName,
+		authConfig: authConfig,
+	}
 
 	// Create the client.
 	err := w.createClient()
@@ -80,12 +99,45 @@ func (w *Watcher) createClient() error {
 		DialTimeout:          time.Second * 30,
 	}
 
+	if w.authConfig != nil {
+		if w.authConfig.UseTLS {
+			tlsConfig, err := createTLSConfig(w.authConfig.CACert, w.authConfig.ClientCert, w.authConfig.ClientKey)
+			if err != nil {
+				return errors.Wrap(err, "unable to create TLS config")
+			}
+
+			cfg.TLS = tlsConfig
+		}
+
+		if w.authConfig.Username != "" && w.authConfig.Password != "" {
+			cfg.Username = w.authConfig.Username
+			cfg.Password = w.authConfig.Password
+		}
+	}
+
 	c, err := client.New(cfg)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "unable to create etcd client")
 	}
+
 	w.client = c
+
 	return nil
+}
+
+func createTLSConfig(caCert, clientCert, clientKey string) (*tls.Config, error) {
+	cert, err := tls.X509KeyPair([]byte(clientCert), []byte(clientKey))
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to load cert + key")
+	}
+
+	caCertPool := x509.NewCertPool()
+	caCertPool.AppendCertsFromPEM([]byte(caCert))
+
+	return &tls.Config{
+		Certificates: []tls.Certificate{cert},
+		RootCAs:      caCertPool,
+	}, nil
 }
 
 // SetUpdateCallback sets the callback function that the watcher will call
