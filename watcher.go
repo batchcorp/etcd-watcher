@@ -18,7 +18,6 @@ import (
 	"context"
 	"crypto/tls"
 	"crypto/x509"
-	"log"
 	"runtime"
 	"strconv"
 	"sync"
@@ -166,14 +165,13 @@ func (w *Watcher) Update() error {
 			if err != nil {
 				return err
 			}
-			log.Println("Get revision: ", rev)
+
 			rev += 1
 		}
 	}
 
 	newRev := strconv.Itoa(rev)
 
-	log.Println("Set revision: ", newRev)
 	_, err = w.client.Put(context.TODO(), w.keyName, newRev)
 	return err
 }
